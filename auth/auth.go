@@ -13,14 +13,14 @@ import (
 )
 
 const (
-	credentialFile = "./client_secret_150306401807-tg3007pjnckcdfcr0nr3nvb9qmu1rcar.apps.googleusercontent.com.json"
-	tokenFile      = "token.json"
-	driveScope     = "https://wwww.googleapis.com/auth/drive"
+	// CredentialFile = "./client_secret_150306401807-tg3007pjnckcdfcr0nr3nvb9qmu1rcar.apps.googleusercontent.com.json"
+	tokenFile  = "token.json"
+	driveScope = "https://wwww.googleapis.com/auth/drive"
 )
 
 // load credentials and return an Oauth2 config with google drive scope
-func GetOAuthConfig() (*oauth2.Config, error) {
-	data, err := os.ReadFile(credentialFile)
+func GetOAuthConfig(credentialFilePath string) (*oauth2.Config, error) {
+	data, err := os.ReadFile(credentialFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read credentials file: %v", err)
 	}
@@ -35,14 +35,14 @@ func GetOAuthConfig() (*oauth2.Config, error) {
 
 // retrieves an OAuth2 client using a saved token or authenticate the user
 func GetClient(config *oauth2.Config) (*http.Client, error) {
-	token, err := getTokenFromFile(tokenFile)
+	token, err := GetTokenFromFile(tokenFile)
 	if err != nil {
 		// no valid token, request a new one
 		token, err = AuthenticateUser(config)
 		if err != nil {
 			return nil, err
 		}
-		saveToken(tokenFile, token)
+		SaveToken(tokenFile, token)
 	}
 	return config.Client(context.Background(), token), nil
 }

@@ -7,7 +7,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func getTokenFromFile(filepath string) (*oauth2.Token, error) {
+func GetTokenFromFile(filepath string) (*oauth2.Token, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func getTokenFromFile(filepath string) (*oauth2.Token, error) {
 	return token, nil
 }
 
-func saveToken(filepath string, token *oauth2.Token) error {
+func SaveToken(filepath string, token *oauth2.Token) error {
 	file, err := os.Create(filepath)
 	if err != nil {
 		return err

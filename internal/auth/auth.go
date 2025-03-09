@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -70,29 +69,6 @@ func AuthenticateUser(config *oauth2.Config) (*oauth2.Token, error) {
 		return nil, fmt.Errorf("failed to exchange auth code for token: %v", err)
 	}
 	return token, nil
-}
-
-func getTokenFromFile(filepath string) (*oauth2.Token, error) {
-	file, err := os.Open(filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	token := &oauth2.Token{}
-	err = json.NewDecoder(file).Decode(token)
-	if err != nil {
-		return nil, err
-	}
-	return token, nil
-}
-
-func saveToken(filepath string, token *oauth2.Token) error {
-	file, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	return json.NewEncoder(file).Encode(token)
 }
 
 func openBrowser(url string) error {

@@ -1,21 +1,23 @@
 package auth
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
 const (
-	// CredentialFile = "./client_secret_150306401807-tg3007pjnckcdfcr0nr3nvb9qmu1rcar.apps.googleusercontent.com.json"
 	tokenFile  = "token.json"
-	driveScope = "https://wwww.googleapis.com/auth/drive"
+	driveScope = "https://www.googleapis.com/auth/drive"
 )
 
 // load credentials and return an Oauth2 config with google drive scope
@@ -46,28 +48,38 @@ func GetClient(config *oauth2.Config) (*http.Client, error) {
 	}
 	return config.Client(context.Background(), token), nil
 }
-
 func AuthenticateUser(config *oauth2.Config) (*oauth2.Token, error) {
-	// Generate an auth URL and open it in a browser
+	// Generate an auth URL
 	url := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Println("Open this URL in your browser and authenticate the app:")
 	fmt.Println(url)
 
-	// open browser automatically
+	// Attempt to open the browser automatically
 	if err := openBrowser(url); err != nil {
 		fmt.Println("Please open the link manually.")
 	}
 
-	// Read the auth code from usr input
+	// Read the auth code from user input
 	fmt.Print("Enter the authentication code: ")
-	var authCode string
-	fmt.Scan(&authCode)
+	reader := bufio.NewReader(os.Stdin)
+	authCode, err := reader.ReadString('\n')
+	if err != nil {
+		return nil, fmt.Errorf("failed to read input: %v", err)
+	}
+	authCode = strings.TrimSpace(authCode)
 
 	// Exchange the auth code for an access token
 	token, err := config.Exchange(context.Background(), authCode)
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange auth code for token: %v", err)
 	}
+
+	// Save the token for future use
+	err = SaveToken("token.json", token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to save token: %v", err)
+	}
+
 	return token, nil
 }
 
@@ -82,4 +94,27 @@ func openBrowser(url string) error {
 	default:
 		return fmt.Errorf("Unsupported platform")
 	}
+}
+
+func GetTokenFromFile(filepath string) (*oauth2.Token, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	token := &oauth2.Token{}
+	err = json.NewDecoder(file).Decode(token)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
+
+func SaveToken(filepath string, token *oauth2.Token) error {
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return json.NewEncoder(file).Encode(token)
 }

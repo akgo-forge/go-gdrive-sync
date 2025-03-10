@@ -48,6 +48,7 @@ func GetClient(config *oauth2.Config) (*http.Client, error) {
 	}
 	return config.Client(context.Background(), token), nil
 }
+
 func AuthenticateUser(config *oauth2.Config) (*oauth2.Token, error) {
 	// Generate an auth URL
 	url := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)

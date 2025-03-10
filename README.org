@@ -1,0 +1,21 @@
+* go-gdrive-sync
+file system for Google Drive written in Go. It lets you mount your Google Drive on Linux
+
+** Set up OAuth2 [5/5]
++ [X] Load client secrets, Initialize OAuth2 config
++ [X] Check if token exists, exchange auth code for an access token
++ [X] Use the stored token (or refresh if expired)
++ [X] Authenticate the user if needed
++ [X] Testing
+
+** Google Drive API Integration [0/4]
++ [ ] Initialize Drive Service
++ [ ] Basic Operations [0/4]
+  + [ ] List files in Drive
+  + [ ] Upload a file
+  + [ ] Download a file
+  + [ ] Delete a file
++ [ ] Handle Errors & Logging [0/2]
+  + [ ] Implement structured error handling
+  + [ ] Add logging to track operations
++ [ ] Testing - unit tests for Drive API functions
